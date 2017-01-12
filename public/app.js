@@ -15,11 +15,11 @@ new Vue({
         this.ws = new WebSocket('ws://' + window.location.host + '/ws');
         this.ws.addEventListener('message', function(e) {
             var msg = JSON.parse(e.data);
-            self.chatContent += '<div class="chip">'
+            self.chatContent += '<div class="chat-line">'
                     + '<img src="' + self.gravatarURL(msg.email) + '">' // Avatar
-                    + msg.username
-                + '</div>'
-                + emojione.toImage(msg.message) + '<br/>'; // Parse emojis
+                    + '<span class="chat-name">' + msg.username + ':</span>'
+                    + '<span class="chat-content">' + emojione.toImage(msg.message) + '<span>'
+                    + '</div>';
 
             var element = document.getElementById('chat-messages');
             element.scrollTop = element.scrollHeight; // Auto scroll to the bottom

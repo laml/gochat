@@ -1,16 +1,72 @@
-body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
+html, body, main {
+	height: 100%;
+	overflow: hidden;
+}
+
+header, main, footer {
+    padding-left: 300px;
+}
+
+@media only screen and (max-width: 992px) {
+	header, main, footer {
+	    padding-left: 0;
+	}	
 }
 
 main {
-    flex: 1 0 auto;
+	display: flex;
+  	flex-flow: column;
+}
+
+.nopadding {
+	padding-left: 0px;
 }
 
 #chat-messages {
-    min-height: 10vh;
-    height: 60vh;
+	flex: 2;
     width: 100%;
-    overflow-y: scroll;
+    overflow: auto;
+    padding: 10px 0 0 10px;
+}
+
+.chat-line {
+	margin: 5px 10px 5px 0;
+}
+
+.chat-line img {
+	float: left;
+	width: 35px;
+}
+
+.chat-line .chat-name {
+	display: block;
+	font-weight: bold;
+	margin-left: 40px;
+}
+
+.chat-line .chat-content {
+	display: block;
+	margin-left: 40px;
+}
+
+.chat-input {
+	position: relative;
+	margin-left: 10px;
+	margin-right: 10px;
+	padding: 10px;
+}
+
+.chat-input .btn {
+	float: left;
+	padding: 0 1rem;
+}
+
+.chat-input .input-wrapper {
+	overflow: hidden;
+	padding-left: 10px;
+}
+
+.chat-input .input-wrapper input {
+	height: 2.3rem;
+	margin: 0;
 }
