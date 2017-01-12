@@ -41,8 +41,8 @@ new Vue({
         },
 
         join: function () {
-            if (!this.email) {
-                Materialize.toast('You must enter an email', 2000);
+            if (!this.email || /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email) == false) {
+                Materialize.toast('You must enter an valid email', 2000);
                 return
             }
             if (!this.username) {
