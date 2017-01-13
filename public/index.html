@@ -41,7 +41,7 @@
     </div>
     <div class="row" style="width:300px" v-if="!joined">
         <div class="input-field">
-            <input type="text" v-model.trim="username" placeholder="Nickname">
+            <input type="text" v-bind:value="username" v-on:input="username = $event.target.value" placeholder="Nickname" @keyup.enter="join">
         </div>
         <div class="input-field center-align">
             <button class="waves-effect waves-light btn" @click="join()">

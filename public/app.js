@@ -46,5 +46,11 @@ new Vue({
             this.username = $('<p>').html(this.username).text();
             this.joined = true;
         }
+    },
+
+    watch: {
+        username: function (newQuestion) {
+            this.username = this.username.replace(/[^a-zA-Z0-9]/g, "").substring(0, 30);
+        }
     }
 });
