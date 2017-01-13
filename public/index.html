@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Go Chat</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/emojione/2.2.6/assets/css/emojione.min.css"/>
     <link rel="stylesheet" href="/style.css">
-
 </head>
 <body>
 <header>
@@ -41,10 +41,7 @@
     </div>
     <div class="row" style="width:300px" v-if="!joined">
         <div class="input-field">
-            <input type="email" v-model.trim="email" placeholder="Email">
-        </div>
-        <div class="input-field">
-            <input type="text" v-model.trim="username" placeholder="Username">
+            <input type="text" v-model.trim="username" placeholder="Nickname">
         </div>
         <div class="input-field center-align">
             <button class="waves-effect waves-light btn" @click="join()">

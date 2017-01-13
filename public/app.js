@@ -5,7 +5,6 @@ new Vue({
         ws: null, // Our websocket
         newMsg: '', // Holds new messages to be sent to the server
         chatContent: '', // A running list of chat messages displayed on the screen
-        email: null, // Email address used for grabbing an avatar
         username: null, // Our username
         joined: false // True if email and username have been filled in
     },
@@ -16,7 +15,7 @@ new Vue({
         this.ws.addEventListener('message', function(e) {
             var msg = JSON.parse(e.data);
             self.chatContent += '<div class="chat-line">'
-                    + '<img src="' + self.gravatarURL(msg.email) + '">' // Avatar
+                    + '<img src="http://image.flaticon.com/icons/svg/149/149071.svg">' // Avatar
                     + '<span class="chat-name">' + msg.username + ':</span>'
                     + '<span class="chat-content">' + emojione.toImage(msg.message) + '<span>'
                     + '</div>';
@@ -31,7 +30,6 @@ new Vue({
             if (this.newMsg != '') {
                 this.ws.send(
                     JSON.stringify({
-                        email: this.email,
                         username: this.username,
                         message: $('<p>').html(this.newMsg).text() // Strip out html
                     }
@@ -41,21 +39,12 @@ new Vue({
         },
 
         join: function () {
-            if (!this.email || /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email) == false) {
-                Materialize.toast('You must enter an valid email', 2000);
-                return
-            }
             if (!this.username) {
                 Materialize.toast('You must choose a username', 2000);
                 return
             }
-            this.email = $('<p>').html(this.email).text();
             this.username = $('<p>').html(this.username).text();
             this.joined = true;
-        },
-
-        gravatarURL: function(email) {
-            return 'http://www.gravatar.com/avatar/' + CryptoJS.MD5(email);
         }
     }
 });
