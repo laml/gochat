@@ -10,19 +10,7 @@ new Vue({
     },
 
     created: function() {
-        var self = this;
-        this.ws = new WebSocket('ws://' + window.location.host + '/ws');
-        this.ws.addEventListener('message', function(e) {
-            var msg = JSON.parse(e.data);
-            self.chatContent += '<div class="chat-line">'
-                    + '<img src="http://image.flaticon.com/icons/svg/149/149071.svg">' // Avatar
-                    + '<span class="chat-name">' + msg.username + ':</span>'
-                    + '<span class="chat-content">' + emojione.toImage(msg.message) + '<span>'
-                    + '</div>';
-
-            var element = document.getElementById('chat-messages');
-            element.scrollTop = element.scrollHeight; // Auto scroll to the bottom
-        });
+        
     },
 
     methods: {
@@ -44,7 +32,40 @@ new Vue({
                 return
             }
             this.username = $('<p>').html(this.username).text();
-            this.joined = true;
+
+            var self = this;
+            this.ws = new WebSocket('ws://' + window.location.host + '/ws');
+
+            this.ws.onopen = function() {
+                console.log('connected');
+                self.joined = true;
+            };
+
+            this.ws.onclose = function(evt) {
+                if (evt.code == 3001) {
+                    console.log('ws closed');
+                    self.ws = null;
+                } else {
+                    self.ws = null;
+                    console.log('ws connection error');
+                }
+            };
+
+            this.ws.onmessage = function(msg) {
+                var msg = JSON.parse(msg.data);
+                self.chatContent += '<div class="chat-line">'
+                    + '<img src="http://image.flaticon.com/icons/svg/149/149071.svg">' // Avatar
+                    + '<span class="chat-name">' + msg.username + ':</span>'
+                    + '<span class="chat-content">' + emojione.toImage(msg.message) + '</span>'
+                    + '</div>';
+
+                var element = document.getElementById('chat-messages');
+                element.scrollTop = element.scrollHeight; // Auto scroll to the bottom
+            };
+
+            this.ws.onerror = function() {
+                console.log('error');
+            };
         }
     },
 

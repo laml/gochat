@@ -18,6 +18,10 @@ main {
   	flex-flow: column;
 }
 
+[v-cloak] {
+  display: none;
+}
+
 .nopadding {
 	padding-left: 0px;
 }
