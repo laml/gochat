@@ -17,9 +17,9 @@
     <ul id="nav-mobile" class="side-nav fixed" v-if="joined">
         <li class="search">
             <nav>
-                <div class="nav-wrapper">
+                <div class="nav-wrapper nav-avatar">
                     <input type="file" @change="setAvatar" accept="image/*" style="display:none">
-                    <img class="left circle" :src="image" width="40" style="margin:10px" @click="triggerUpload"/>
+                    <img class="left circle" :src="avatar" width="40" style="margin:10px" @click="triggerUpload"/>
                     <span style="font-size:2.1rem; color:#fff">{{username}}</span>
                 </div>
             </nav>
@@ -46,8 +46,19 @@
             <input type="text" v-bind:value="username" v-on:input="username = $event.target.value" placeholder="Nickname" @keyup.enter="join" autofocus>
         </div>
         <div class="input-field center-align">
-            <button class="waves-effect waves-light btn" @click="join">
-                <i class="material-icons right">done</i>
+            <button class="waves-effect waves-light btn" @click="join" style="width:130px">
+                <i class="material-icons right" v-if="connected">done</i>
+                <div class="preloader-wrapper tiny active right" v-if="connecting" style="margin-top:8px">
+                    <div class="spinner-layer spinner-white">
+                      <div class="circle-clipper left">
+                        <div class="circle"></div>
+                      </div><div class="gap-patch">
+                        <div class="circle"></div>
+                      </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                      </div>
+                    </div>
+                  </div>
                 Join
             </button>
         </div>

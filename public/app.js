@@ -1,14 +1,22 @@
+var STATUS = {
+    WAIT: 0,
+    CONNECTING: 1,
+    CONNECTED: 3,
+    JOINED: 2
+}
+
 new Vue({
     el: '#app',
 
     data: {
-        ws: null, // Our websocket
+        ws: null, // websocket
         newMsg: '', // Holds new messages to be sent to the server
         chatContent: '', // A running list of chat messages displayed on the screen
-        username: null, // Our username
-        joined: false, // True if email and username have been filled in
+        username: null, // Nickname
 
-        image: 'http://image.flaticon.com/icons/svg/149/149071.svg' // default avatar
+        status: STATUS.WAIT,
+
+        avatar: 'http://image.flaticon.com/icons/svg/149/149071.svg' // default avatar
     },
 
     created: function() {
@@ -30,6 +38,8 @@ new Vue({
         },
 
         join: function () {
+            if (this.status != STATUS.WAIT) return;
+
             if (!this.username) {
                 Materialize.toast('You must choose a username', 2000);
                 return
@@ -38,15 +48,26 @@ new Vue({
 
             var self = this;
 
+            this.status = STATUS.CONNECTING;
+
+            var fakeDelay = 2000;
+
             this.ws = new WebSocket('ws://' + window.location.host + '/ws');
 
             this.ws.onopen = function() {
                 console.log('connected');
-                self.joined = true;
+
+                setTimeout(function() {
+                    self.status = STATUS.CONNECTED;
+                }, fakeDelay);
+
+                setTimeout(function() {
+                    self.status = STATUS.JOINED;
+                }, fakeDelay + 1000);
 
                 setTimeout(function() {
                     document.getElementById('chat-textbox').focus();
-                }, 500);
+                }, fakeDelay + 1500);
             };
 
             this.ws.onclose = function(evt) {
@@ -57,6 +78,8 @@ new Vue({
                     self.ws = null;
                     console.log('ws connection error');
                 }
+
+                this.status = STATUS.WAIT;
             };
 
             this.ws.onmessage = function(msg) {
@@ -73,6 +96,8 @@ new Vue({
 
             this.ws.onerror = function() {
                 console.log('error');
+
+                this.status = STATUS.WAIT;
             };
         },
 
@@ -82,7 +107,7 @@ new Vue({
                 return;
 
             var reader = new FileReader();
-            var vm = this;
+            var self = this;
 
             reader.onload = function(e) {
                 // Create a canvas to resize image
@@ -96,7 +121,7 @@ new Vue({
                 image.src = e.target.result;
                 image.onload = function() {
                     ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
-                    vm.image = canvas.toDataURL();
+                    self.avatar = canvas.toDataURL();
                 }
             };
             reader.readAsDataURL(files[0]);
@@ -104,6 +129,21 @@ new Vue({
 
         triggerUpload: function(e) {
             $(e.target).siblings('input:file').click();
+        }
+    },
+
+    computed: {
+        wait: function () {
+            return this.status == STATUS.WAIT;
+        },
+        connecting: function () {
+            return this.status == STATUS.CONNECTING;
+        },
+        connected: function () {
+            return this.status == STATUS.CONNECTED;
+        },
+        joined: function () {
+            return this.status == STATUS.JOINED;
         }
     },
 

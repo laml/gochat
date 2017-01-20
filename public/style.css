@@ -26,6 +26,23 @@ main {
 	padding-left: 0px;
 }
 
+/* CSS added to materializecss */
+
+.preloader-wrapper.tiny {
+	width: 18px;
+	height: 18px;
+}
+
+.spinner-white {
+	border-color: #fff;
+}
+
+/* End */
+
+.nav-avatar img:hover {
+	cursor: pointer;
+}
+
 #chat-messages {
 	flex: 2;
     width: 100%;
