@@ -18,7 +18,9 @@
         <li class="search">
             <nav>
                 <div class="nav-wrapper">
-                    <a href="/" class="brand-logo center" style="font-size:2.1rem; color:#fff">Go Chat</a>
+                    <input type="file" @change="setAvatar" accept="image/*" style="display:none">
+                    <img class="left circle" :src="image" width="40" style="margin:10px" @click="triggerUpload"/>
+                    <span style="font-size:2.1rem; color:#fff">{{username}}</span>
                 </div>
             </nav>
         </li>
@@ -32,19 +34,19 @@
     <div id="chat-messages" class="card-content" v-html="chatContent" v-if="joined">
     </div>
     <div class="card input-field chat-input" v-if="joined">
-        <div class="btn">
+        <div class="btn" @click="send">
             <i class="material-icons">mode_edit</i>
         </div>
         <div class="input-wrapper">
-            <input type="text" v-model="newMsg" @keyup.enter="send">
+            <input id="chat-textbox" type="text" v-model="newMsg" @keyup.enter="send">
         </div>
     </div>
     <div class="row" style="width:300px" v-if="!joined">
         <div class="input-field">
-            <input type="text" v-bind:value="username" v-on:input="username = $event.target.value" placeholder="Nickname" @keyup.enter="join">
+            <input type="text" v-bind:value="username" v-on:input="username = $event.target.value" placeholder="Nickname" @keyup.enter="join" autofocus>
         </div>
         <div class="input-field center-align">
-            <button class="waves-effect waves-light btn" @click="join()">
+            <button class="waves-effect waves-light btn" @click="join">
                 <i class="material-icons right">done</i>
                 Join
             </button>
@@ -55,7 +57,6 @@
 <script src="https://unpkg.com/vue@2.1.3/dist/vue.min.js"></script>
 <script src="https://cdn.jsdelivr.net/emojione/2.2.6/lib/js/emojione.min.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
 <script src="/app.js"></script>
 </body>

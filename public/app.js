@@ -6,11 +6,12 @@ new Vue({
         newMsg: '', // Holds new messages to be sent to the server
         chatContent: '', // A running list of chat messages displayed on the screen
         username: null, // Our username
-        joined: false // True if email and username have been filled in
+        joined: false, // True if email and username have been filled in
+
+        image: 'http://image.flaticon.com/icons/svg/149/149071.svg' // default avatar
     },
 
     created: function() {
-        
     },
 
     methods: {
@@ -23,6 +24,8 @@ new Vue({
                     }
                 ));
                 this.newMsg = ''; // Reset newMsg
+
+                document.getElementById('chat-textbox').focus();
             }
         },
 
@@ -34,11 +37,16 @@ new Vue({
             this.username = $('<p>').html(this.username).text();
 
             var self = this;
+
             this.ws = new WebSocket('ws://' + window.location.host + '/ws');
 
             this.ws.onopen = function() {
                 console.log('connected');
                 self.joined = true;
+
+                setTimeout(function() {
+                    document.getElementById('chat-textbox').focus();
+                }, 500);
             };
 
             this.ws.onclose = function(evt) {
@@ -66,6 +74,36 @@ new Vue({
             this.ws.onerror = function() {
                 console.log('error');
             };
+        },
+
+        setAvatar: function(e) {
+            var files = e.target.files || e.dataTransfer.files;
+            if (!files.length)
+                return;
+
+            var reader = new FileReader();
+            var vm = this;
+
+            reader.onload = function(e) {
+                // Create a canvas to resize image
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+
+                canvas.width = 100;
+                canvas.height = 100;
+
+                var image = new Image();
+                image.src = e.target.result;
+                image.onload = function() {
+                    ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+                    vm.image = canvas.toDataURL();
+                }
+            };
+            reader.readAsDataURL(files[0]);
+        },
+
+        triggerUpload: function(e) {
+            $(e.target).siblings('input:file').click();
         }
     },
 
