@@ -20,6 +20,7 @@ var upgrader = websocket.Upgrader{
 // Define our message object
 type Message struct {
 	Username string `json:"username"`
+	Avatar string `json:"avatar"`
 	Message  string `json:"message"`
 }
 

@@ -12,11 +12,11 @@ new Vue({
         ws: null, // websocket
         newMsg: '', // Holds new messages to be sent to the server
         chatContent: '', // A running list of chat messages displayed on the screen
-        username: null, // Nickname
+        username: sessionStorage.username, // Nickname
 
         status: STATUS.WAIT,
 
-        avatar: 'http://image.flaticon.com/icons/svg/149/149071.svg' // default avatar
+        avatar: sessionStorage.avatar || 'http://image.flaticon.com/icons/svg/149/149071.svg' // default avatar
     },
 
     created: function() {
@@ -28,6 +28,7 @@ new Vue({
                 this.ws.send(
                     JSON.stringify({
                         username: this.username,
+                        avatar: this.avatar,
                         message: $('<p>').html(this.newMsg).text() // Strip out html
                     }
                 ));
@@ -44,7 +45,7 @@ new Vue({
                 Materialize.toast('You must choose a username', 2000);
                 return
             }
-            this.username = $('<p>').html(this.username).text();
+            this.username = sessionStorage.username = $('<p>').html(this.username).text();
 
             var self = this;
 
@@ -85,7 +86,7 @@ new Vue({
             this.ws.onmessage = function(msg) {
                 var msg = JSON.parse(msg.data);
                 self.chatContent += '<div class="chat-line">'
-                    + '<img src="http://image.flaticon.com/icons/svg/149/149071.svg">' // Avatar
+                    + '<img class="circle" src="' + msg.avatar + '">' // Avatar
                     + '<span class="chat-name">' + msg.username + ':</span>'
                     + '<span class="chat-content">' + emojione.toImage(msg.message) + '</span>'
                     + '</div>';
@@ -121,7 +122,7 @@ new Vue({
                 image.src = e.target.result;
                 image.onload = function() {
                     ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
-                    self.avatar = canvas.toDataURL();
+                    self.avatar = sessionStorage.avatar = canvas.toDataURL();
                 }
             };
             reader.readAsDataURL(files[0]);
@@ -149,7 +150,7 @@ new Vue({
 
     watch: {
         username: function (newQuestion) {
-            this.username = this.username.replace(/[^a-zA-Z0-9]/g, "").substring(0, 30);
+            this.username = this.username.replace(/[^a-zA-Z0-9_]/g, "").substring(0, 30);
         }
     }
 });
