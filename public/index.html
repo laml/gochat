@@ -43,10 +43,10 @@
     </div>
     <div class="row" style="width:300px" v-if="!joined">
         <div class="input-field">
-            <input type="text" v-bind:value="username" v-on:input="username = $event.target.value" placeholder="Nickname" @keyup.enter="join" autofocus>
+            <input type="text" v-bind:value="username" v-on:input="username = $event.target.value" placeholder="Nickname" @keyup.enter="connect" autofocus>
         </div>
         <div class="input-field center-align">
-            <button class="waves-effect waves-light btn" @click="join" style="width:130px">
+            <button class="waves-effect waves-light btn" @click="connect" style="width:130px">
                 <i class="material-icons right" v-if="connected">done</i>
                 <div class="preloader-wrapper tiny active right" v-if="connecting" style="margin-top:8px">
                     <div class="spinner-layer spinner-white">

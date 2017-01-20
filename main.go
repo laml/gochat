@@ -3,11 +3,22 @@ package main
 import (
 	"log"
 	"net/http"
-
+	"math/rand"
+	"time"
 	"github.com/gorilla/websocket"
 )
 
-var clients = make(map[*websocket.Conn]bool) // connected clients
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randSeq(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letters[rand.Intn(len(letters))]
+    }
+    return string(b)
+}
+
+var clients = make(map[string]*websocket.Conn) // connected clients
 var broadcast = make(chan Message)           // broadcast channel
 
 // Configure the upgrader
@@ -19,12 +30,17 @@ var upgrader = websocket.Upgrader{
 
 // Define our message object
 type Message struct {
+	ClientId string `json:"id"`
+	Command string `json:"cmd"`
 	Username string `json:"username"`
 	Avatar string `json:"avatar"`
 	Message  string `json:"message"`
+	Error string `json:"error"`
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	// Create a simple file server
 	fs := http.FileServer(http.Dir("./public"))
 	http.Handle("/", fs)
@@ -53,17 +69,23 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	defer ws.Close()
 
 	// Register our new client
-	clients[ws] = true
+	id := randSeq(6)
+
+	clients[id] = ws
 
 	for {
 		var msg Message
+
 		// Read in a new message as JSON and map it to a Message object
 		err := ws.ReadJSON(&msg)
 		if err != nil {
 			log.Printf("error: %v", err)
-			delete(clients, ws)
+			delete(clients, id)
 			break
 		}
+
+		msg.ClientId = id
+
 		// Send the newly received message to the broadcast channel
 		broadcast <- msg
 	}
@@ -73,14 +95,51 @@ func handleMessages() {
 	for {
 		// Grab the next message from the broadcast channel
 		msg := <-broadcast
-		// Send it out to every client that is currently connected
-		for client := range clients {
-			err := client.WriteJSON(msg)
-			if err != nil {
-				log.Printf("error: %v", err)
-				client.Close()
-				delete(clients, client)
-			}
+
+		switch msg.Command {
+			case "C_JOIN":
+				// Send accept back to the client
+				newMsg := Message {
+					ClientId: msg.ClientId,
+					Command: "S_ACCEPT" }
+
+				sendMessage(newMsg)
+
+				// Notify another clients
+				newMsg = Message {
+					Username: msg.Username,
+					Command: "S_NEWCOMER" }
+
+				for id, _ := range clients {
+					if id != msg.ClientId {
+						newMsg.ClientId = id
+						sendMessage(newMsg)
+					}
+				}
+
+			case "C_MSG":
+				// Send it out to every client that is currently connected
+				for id, _ := range clients {
+					msg.ClientId = id
+					sendMessage(msg)
+				}
+
+			default:
 		}
+		
+	}
+}
+
+func  sendMessage(msg Message) {
+	client, ok := clients[msg.ClientId]
+
+	if !ok { return }
+
+	err := client.WriteJSON(msg)
+
+	if err != nil {
+		log.Printf("error: %v", err)
+		client.Close()
+		delete(clients, msg.ClientId)
 	}
 }

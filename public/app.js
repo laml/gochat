@@ -5,7 +5,7 @@ var STATUS = {
     JOINED: 2
 }
 
-new Vue({
+var app = new Vue({
     el: '#app',
 
     data: {
@@ -27,6 +27,7 @@ new Vue({
             if (this.newMsg != '') {
                 this.ws.send(
                     JSON.stringify({
+                        cmd: 'C_MSG',
                         username: this.username,
                         avatar: this.avatar,
                         message: $('<p>').html(this.newMsg).text() // Strip out html
@@ -38,7 +39,7 @@ new Vue({
             }
         },
 
-        join: function () {
+        connect: function () {
             if (this.status != STATUS.WAIT) return;
 
             if (!this.username) {
@@ -51,24 +52,16 @@ new Vue({
 
             this.status = STATUS.CONNECTING;
 
-            var fakeDelay = 2000;
+            // already connected to websocket
+            if (this.ws) {
+                this.join();
+                return
+            }
 
             this.ws = new WebSocket('ws://' + window.location.host + '/ws');
 
             this.ws.onopen = function() {
-                console.log('connected');
-
-                setTimeout(function() {
-                    self.status = STATUS.CONNECTED;
-                }, fakeDelay);
-
-                setTimeout(function() {
-                    self.status = STATUS.JOINED;
-                }, fakeDelay + 1000);
-
-                setTimeout(function() {
-                    document.getElementById('chat-textbox').focus();
-                }, fakeDelay + 1500);
+                self.join();
             };
 
             this.ws.onclose = function(evt) {
@@ -85,14 +78,46 @@ new Vue({
 
             this.ws.onmessage = function(msg) {
                 var msg = JSON.parse(msg.data);
-                self.chatContent += '<div class="chat-line">'
-                    + '<img class="circle" src="' + msg.avatar + '">' // Avatar
-                    + '<span class="chat-name">' + msg.username + ':</span>'
-                    + '<span class="chat-content">' + emojione.toImage(msg.message) + '</span>'
-                    + '</div>';
 
-                var element = document.getElementById('chat-messages');
-                element.scrollTop = element.scrollHeight; // Auto scroll to the bottom
+                var fakeDelay = 2000;
+
+                switch(msg.cmd) {
+                    case 'S_REFUSE':
+                        Materialize.toast(msg.error, 2000);
+                        break;
+
+                    case 'S_ACCEPT':
+                        setTimeout(function() {
+                            self.status = STATUS.CONNECTED;
+                        }, fakeDelay);
+
+                        setTimeout(function() {
+                            self.status = STATUS.JOINED;
+
+                        }, fakeDelay + 1000);
+
+                        setTimeout(function() {
+                            document.getElementById('chat-textbox').focus();
+                        }, fakeDelay + 1500);
+                        break;
+
+                    case 'S_NEWCOMER':
+                        if (msg.username != self.username) {
+                            Materialize.toast(msg.username + ' has joined', 2000);
+                        }
+                        break;
+
+                    case 'C_MSG':
+                        self.chatContent += '<div class="chat-line">'
+                            + '<img class="circle" src="' + msg.avatar + '">' // Avatar
+                            + '<span class="chat-name">' + msg.username + ':</span>'
+                            + '<span class="chat-content">' + emojione.toImage(msg.message) + '</span>'
+                            + '</div>';
+
+                        var element = document.getElementById('chat-messages');
+                        element.scrollTop = element.scrollHeight; // Auto scroll to the bottom
+                        break;
+                }
             };
 
             this.ws.onerror = function() {
@@ -100,6 +125,17 @@ new Vue({
 
                 this.status = STATUS.WAIT;
             };
+        },
+
+        join: function() {
+            // websocket opened, asked for joining
+            this.ws.send(
+                JSON.stringify({
+                    cmd: 'C_JOIN',
+                    username: this.username,
+                    avatar: this.avatar
+                }
+            ));
         },
 
         setAvatar: function(e) {
