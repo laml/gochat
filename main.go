@@ -30,12 +30,12 @@ var upgrader = websocket.Upgrader{
 
 // Define our message object
 type Message struct {
-	ClientId string `json:"id"`
+	ClientId string `json:"-"`
 	Command string `json:"cmd"`
-	Username string `json:"username"`
-	Avatar string `json:"avatar"`
-	Message  string `json:"message"`
-	Error string `json:"error"`
+	Username string `json:"username,omitempty"`
+	Avatar string `json:"avatar,omitempty"`
+	Message  string `json:"message,omitempty"`
+	Error string `json:"error,omitempty"`
 }
 
 func main() {
