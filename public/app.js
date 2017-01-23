@@ -11,12 +11,13 @@ var app = new Vue({
     data: {
         ws: null, // websocket
         newMsg: '', // Holds new messages to be sent to the server
-        chatContent: '', // A running list of chat messages displayed on the screen
         username: sessionStorage.username, // Nickname
 
         status: STATUS.WAIT,
 
-        avatar: sessionStorage.avatar || 'http://image.flaticon.com/icons/svg/149/149071.svg' // default avatar
+        avatar: sessionStorage.avatar || 'http://image.flaticon.com/icons/svg/149/149071.svg', // default avatar
+
+        messages: []
     },
 
     created: function() {
@@ -108,14 +109,13 @@ var app = new Vue({
                         break;
 
                     case 'C_MSG':
-                        self.chatContent += '<div class="chat-line">'
-                            + '<img class="circle" src="' + msg.avatar + '">' // Avatar
-                            + '<span class="chat-name">' + msg.username + ':</span>'
-                            + '<span class="chat-content">' + emojione.toImage(msg.message) + '</span>'
-                            + '</div>';
+                        msg.next = self.messages.length > 0 && self.messages[self.messages.length - 1].username == msg.username;
+                        self.messages.push(msg);
 
-                        var element = document.getElementById('chat-messages');
-                        element.scrollTop = element.scrollHeight; // Auto scroll to the bottom
+                        setTimeout(function() {
+                            var element = document.getElementById('chat-messages');
+                            element.scrollTop = element.scrollHeight; // Auto scroll to the bottom
+                        }, 100);
                         break;
                 }
             };

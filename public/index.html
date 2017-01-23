@@ -31,7 +31,12 @@
         <div class="nav-wrapper">
         </div>
     </nav>
-    <div id="chat-messages" class="card-content" v-html="chatContent" v-if="joined">
+    <div id="chat-messages" class="card-content" v-if="joined">
+        <div class="chat-line" v-for="msg in messages" v-bind:class="{ break: !msg.next }">
+            <img class="circle" :src="msg.avatar" v-if="!msg.next">
+            <span class="chat-name" v-if="!msg.next">{{msg.username}}:</span>
+            <span class="chat-content">{{msg.message}}</span>
+        </div>
     </div>
     <div class="card input-field chat-input" v-if="joined">
         <div class="btn" @click="send">
