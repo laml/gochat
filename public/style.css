@@ -43,6 +43,10 @@ main {
 	cursor: pointer;
 }
 
+.room-list .selected a {
+	
+}
+
 #chat-messages {
 	flex: 2;
     width: 100%;

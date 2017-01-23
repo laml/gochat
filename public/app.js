@@ -17,7 +17,13 @@ var app = new Vue({
 
         avatar: sessionStorage.avatar || 'http://image.flaticon.com/icons/svg/149/149071.svg', // default avatar
 
-        messages: []
+        messages: [],
+
+        rooms: {
+            "0": { name: "Public", path: "public" } 
+        },
+
+        currentRoom: "0"
     },
 
     created: function() {
@@ -94,7 +100,9 @@ var app = new Vue({
 
                         setTimeout(function() {
                             self.status = STATUS.JOINED;
-
+                            if (history.pushState) {
+                                history.pushState({}, null, '/r/' + self.rooms[self.currentRoom].path);
+                            }
                         }, fakeDelay + 1000);
 
                         setTimeout(function() {

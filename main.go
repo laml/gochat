@@ -41,7 +41,12 @@ type Message struct {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	// Create a simple file server
+	// handle rooms
+	http.Handle("/r/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./public/index.html");
+	}))
+
+	// Otherwise, act as simple file server
 	fs := http.FileServer(http.Dir("./public"))
 	http.Handle("/", fs)
 

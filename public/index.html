@@ -24,11 +24,17 @@
                 </div>
             </nav>
         </li>
-        <li class="bold"><a href="#" class="waves-effect waves-teal">Room 1</a></li>
-        <li class="bold"><a href="#" class="waves-effect waves-teal">Room 2</a></li>
+        <li class="bold">
+            <ul class="room-list">
+                <li v-for="(room, id) in rooms" v-bind:class="{ active: id == currentRoom }">
+                    <a class="waves-effect waves-teal">{{room.name}}</a>
+                </li>
+            </ul>
+        </li>
     </ul>
     <nav>
         <div class="nav-wrapper">
+            <span class="brand-logo center" v-if="!joined">Welcome to GoChat</span>
         </div>
     </nav>
     <div id="chat-messages" class="card-content" v-if="joined">
